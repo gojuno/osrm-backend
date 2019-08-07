@@ -8,6 +8,7 @@
       - ADDED: new API parameter - `snapping=any|default` to allow snapping to previously unsnappable edges [#5361](https://github.com/Project-OSRM/osrm-backend/pull/5361)
       - ADDED: keepalive support to the osrm-routed HTTP server [#5518](https://github.com/Project-OSRM/osrm-backend/pull/5518)
       - ADDED: flatbuffers output format support [#5513](https://github.com/Project-OSRM/osrm-backend/pull/5513)
+      - ADDED: monitoring endpoint in prometheus format [#5180](https://github.com/Project-OSRM/osrm-backend/pull/5180)
     - Routing:
       - CHANGED: allow routing past `barrier=arch` [#5352](https://github.com/Project-OSRM/osrm-backend/pull/5352)
       - CHANGED: default car weight was reduced to 2000 kg. [#5371](https://github.com/Project-OSRM/osrm-backend/pull/5371)
