@@ -78,7 +78,7 @@ void Connection::handle_read(const boost::system::error_code &error, std::size_t
         }
         request_handler.HandleRequest(current_request, current_reply);
 
-        if (boost::iequals(current_request.connection, "close"))
+        if (boost::iequals(current_request.connection, "close") && processed_requests > 0)
         {
             current_reply.headers.emplace_back("Connection", "close");
         }
