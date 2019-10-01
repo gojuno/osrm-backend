@@ -78,16 +78,17 @@ void Connection::handle_read(const boost::system::error_code &error, std::size_t
         }
         request_handler.HandleRequest(current_request, current_reply);
 
-        if (boost::iequals(current_request.connection, "close"))
+        //if (boost::iequals(current_request.connection, "close"))
         {
             current_reply.headers.emplace_back("Connection", "close");
         }
-        else
+        /*else
         {
             keep_alive = true;
             current_reply.headers.emplace_back("Connection", "keep-alive");
             current_reply.headers.emplace_back("Keep-Alive", "timeout=5, max=512");
         }
+        */
 
         // compress the result w/ gzip/deflate if requested
         switch (compression_type)
