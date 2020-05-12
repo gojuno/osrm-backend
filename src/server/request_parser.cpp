@@ -15,7 +15,8 @@ namespace server
 
 RequestParser::RequestParser()
     : state(internal_state::method_start), current_header({"", ""}),
-      selected_compression(http::no_compression)
+      selected_compression(http::no_compression),
+      content_length(0)
 {
 }
 
@@ -185,6 +186,26 @@ RequestParser::RequestStatus RequestParser::consume(http::request &current_reque
             current_request.connection = current_header.value;
         }
 
+        if (boost::iequals(current_header.name, "Content-Length"))
+        {
+            try
+            {
+                content_length = std::stoi(current_header.value);
+            }
+            catch (const std::exception &e)
+            {
+                // Ignore the header if the parameter isn't an int
+            }
+        }
+
+        if (boost::iequals(current_header.name, "Content-Type"))
+        {
+            if (!boost::icontains(current_header.value, "application/x-uri"))
+            {
+                return RequestStatus::invalid;
+            }
+        }
+
         if (input == '\r')
         {
             state = internal_state::expecting_newline_3;
@@ -252,7 +273,26 @@ RequestParser::RequestStatus RequestParser::consume(http::request &current_reque
             return RequestStatus::indeterminate;
         }
         return RequestStatus::invalid;
-    default: // expecting_newline_3
+    case internal_state::expecting_newline_3:
+        if (input == '\n')
+        {
+            if (content_length > 0)
+            {
+                state = internal_state::body;
+                return RequestStatus::indeterminate;
+            }
+            return RequestStatus::valid;
+        }
+        return RequestStatus::invalid;
+    case internal_state::body:
+        current_request.uri.push_back(input);
+        --content_length;
+        if (content_length <= 0)
+        {
+            return RequestStatus::valid;
+        }
+        return RequestStatus::indeterminate;
+    default: // should never be reached
         return input == '\n' ? RequestStatus::valid : RequestStatus::invalid;
     }
 }
